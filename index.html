@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="text">
+    <input type="checkbox" name="" id="chk">
+    <button onClick="addTodo()">Add</button>
+    <div id="items">
+
+    </div>
+
+</body>
+<script>
+    let items = document.getElementById("items")
+    let text = document.getElementById("text")
+    let chk = document.getElementById("chk")
+
+
+    function getData (){
+        fetch("http://localhost:3000/tasks")
+        .then((data)=>data.json())
+        .then((data)=>data.map((item)=>showTodo(item)))
+    }
+    getData()
+
+    function showTodo(item){
+        let div = document.createElement("div")
+        let p = document.createElement("p")
+        p.innerText = item.title
+        let btn = document.createElement("button")
+        btn.addEventListener("click",()=>del(item.id))
+        btn.innerText = "delete"
+        div.append(p,btn)
+        items.append(div)
+    }
+
+    function addTodo(){
+        fetch("http://localhost:3000/tasks",{
+     method: "POST",
+      
+     body: JSON.stringify({
+         title: text.value,
+         status: chk.checked,
+     }),
+     headers: {
+         "Content-type": "application/json; charset=UTF-8"
+     }
+ }).then(()=>{items.innerHTML=""})
+ .then(()=>getData())
+    }
+
+ function del(id){
+    fetch(`http://localhost:3000/tasks/${id}`,{
+     method: "DELETE"
+ }).then(()=>{items.innerHTML=""})
+ .then(()=>getData())
+ }
+
+
+</script>
+</html>
